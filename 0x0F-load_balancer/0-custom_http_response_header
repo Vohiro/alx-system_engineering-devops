@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# configure my Nginx server so /redirect_me is redirecting to another page
+
+sudo apt-get -y update
+sudo apt-get install -y nginx
+
+echo "Hello World!" | sudo tee /var/www/html/index.html
+echo "Ceci n'est pas une page" | sudo tee /usr/share/nginx/html/custom_404.html
+
+server_name=$(hostname)
+
+custom="\\\n\tlocation / {\n\t\tadd_header X-Served-By $server_name;\n\t}"
+sudo sed -i "51i $custom"  /etc/nginx/sites-available/default
+
+redirect="\\\n\tlocation /redirect_me {\n\t\treturn 301 https://wa.link/hm67lg;\n\t}"
+sudo sed -i "55i $redirect"  /etc/nginx/sites-available/default
+
+
+sudo service nginx restart
